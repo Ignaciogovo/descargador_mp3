@@ -22,7 +22,7 @@ Lanzamos la imagen
 ```
 
 A continuación, solo tendremos que acceder a la ruta http://127.0.0.1:5000 desde el navegador para poder disfrutar del descargador.
-![Imagen de la web](https://github.com/Ignaciogovo/descargador_mp3/varios/imagenes/index.png)
+![Imagen de la web](https://github.com/Ignaciogovo/descargador_mp3/blob/master/varios/imagenes/index.png)
 
 
 
