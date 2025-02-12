@@ -10,7 +10,7 @@ Clonamos el repositorio
 
 Accedemos a directorio app 
 ```bash
-> cd back
+> cd app
 ```
 Creamos la imagen
 ```bash
@@ -22,7 +22,7 @@ Lanzamos la imagen
 ```
 
 A continuación, solo tendremos que acceder a la ruta http://127.0.0.1:5000 desde el navegador para poder disfrutar del descargador.
-
+![Imagen de la web](https://github.com/Ignaciogovo/descargador_mp3/varios/imagenes/index.png)
 
 
 
