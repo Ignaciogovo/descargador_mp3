@@ -1,0 +1,40 @@
+ydl_opts = {
+    'format': 'bestaudio/best',                  # Selecciona la mejor calidad de audio.
+    'outtmpl': 'C:/Musica/%(title)s.%(ext)s',   # Guarda en "C:/Musica" con título y extensión.
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',            # Extrae audio del archivo descargado.
+        'preferredcodec': 'mp3',                # Convierte el audio a MP3.
+        'preferredquality': '192',              # Define la calidad del audio en kbps.
+    }],
+    'ffmpeg_location': 'C:/ffmpeg/bin',         # Ruta a FFmpeg (si no está en PATH).
+    'writesubtitles': True,                     # Descarga subtítulos si están disponibles.
+    'subtitleslangs': ['es'],                   # Subtítulos en español.
+    'noplaylist': True,                         # Evita descargar listas de reproducción completas.
+    'quiet': False,                             # Muestra mensajes en consola.
+    'progress_hooks': [my_progress_hook],       # Llama a una función durante el progreso.
+}
+
+
+
+
+
+
+
+
+
+
+
+
+outtmpl --> 
+
+Variables útiles en outtmpl
+
+Puedes usar las siguientes variables para personalizar nombres y rutas:
+
+    %(title)s: Título del video.
+    %(id)s: ID único del video.
+    %(ext)s: Extensión del archivo (por ejemplo, mp4, mp3).
+    %(uploader)s: Nombre del canal que subió el video.
+    %(upload_date)s: Fecha de subida del video (formato YYYYMMDD).
+    %(playlist)s: Nombre de la lista de reproducción (si corresponde).
+    %(playlist_index)s: Índice del video en la lista de reproducción.

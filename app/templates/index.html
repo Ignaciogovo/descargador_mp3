@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descargador MP3</title>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
+    <style>
+        /* Estilo para la barra de carga */
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #loading img {
+            width: 50px;
+        }
+        /* Personalización adicional para el diseño */
+        body {
+            font-family: "Press Start 2P", cursive;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin: 20px 0;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        button {
+            font-family: "Press Start 2P", cursive;
+        }
+    </style>
+    <script>
+        function mostrarCarga() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('formulario').style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <h1 class="nes-text is-primary">Descargador MP3</h1>
+    <form id="formulario" method="post" onsubmit="mostrarCarga()" class="nes-container with-title">
+        <p class="title">Procesar URL</p>
+        <label for="url" class="nes-text">Introduce una URL:</label>
+        <input type="text" id="url" name="url" class="nes-input" required>
+        <button type="submit" class="nes-btn is-success">Procesar</button>
+    </form>
+    <div id="loading">
+        <p class="nes-text is-warning">Procesando, por favor espera...</p>
+        <img src="https://i.gifer.com/ZZ5H.gif" alt="Cargando...">
+    </div>
+    <p class="nes-text">{{ mensaje }}</p>
+    {% if enlace_descarga %}
+        <a href="{{ enlace_descarga }}" class="nes-btn is-primary">Descargar archivo generado</a>
+    {% endif %}
+</body>
+</html>
+
