@@ -7,16 +7,25 @@ import os
 # */
 ffmpeg_path = get_ffmpeg_exe()
 
-def borrar_archivos():
-    downloads_dir = "downloads"
-    if os.path.exists(downloads_dir):
-        for file in os.listdir(downloads_dir):
-            file_path = os.path.join(downloads_dir, file)
-            try:
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
-            except Exception as e:
-                print(f"No se pudo borrar el archivo {file_path}: {e}")
+def borrar_archivos(nombre=None):
+    if nombre == None:
+        downloads_dir = "downloads"
+        if os.path.exists(downloads_dir):
+            for file in os.listdir(downloads_dir):
+                file_path = os.path.join(downloads_dir, file)
+                try:
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                except Exception as e:
+                    print(f"No se pudo borrar el archivo {file_path}: {e}")
+    else:
+        try:
+                    if os.path.isfile(nombre):
+                        os.remove(nombre)
+        except Exception as e:
+                    print(f"No se pudo borrar el archivo {nombre}: {e}")
+        
+        
 
 def renombrar_archivo(d):
     # Ruta original del archivo
@@ -35,7 +44,6 @@ def renombrar_archivo(d):
 def download_mp3(url):
     try:
         # Borramos los archivos que existan en el directorio:
-        borrar_archivos()
         yt_opts = {
             'verbose': True,
             'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_')# -- Cambiar el nombre del archivo

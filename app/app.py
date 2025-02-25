@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template_string, send_file,render_template
 import os
-from gestion_download import download_mp3
-
+from gestion_download import download_mp3,borrar_archivos
+import threading
 app = Flask(__name__)
 
 # Ruta principal con el formularios
@@ -18,6 +18,9 @@ def formulario():
 
             # Guarda el enlace para la descarga
             enlace_descarga = f"/descargar?archivo={archivo_generado}"
+            # Inicia un hilo para borrar el archivo después de 5 minutos
+            threading.Timer(300,borrar_archivos, args=(archivo_generado,)).start()
+      
             mensaje = "Archivo generado correctamente. Puedes descargarlo a continuación."
         else:
             mensaje = "Por favor, introduce una URL válida."
