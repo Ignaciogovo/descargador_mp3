@@ -12,9 +12,11 @@ def formulario():
 
     if request.method == 'POST':
         url = request.form.get('url')
+        formato = request.form.get('formato')
+
         if url:
             # Llama a la función para procesar la URL
-            archivo_generado = download_mp3(url)
+            archivo_generado = download_mp3(url,formato)
 
             # Guarda el enlace para la descarga
             enlace_descarga = f"/descargar?archivo={archivo_generado}"
@@ -38,3 +40,5 @@ def descargar():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
+        # debug: Se recarga la página
+        #port: Cambiar de puerto

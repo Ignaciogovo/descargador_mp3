@@ -33,25 +33,54 @@
             color: #333;
         }
         form {
-            margin: 20px 0;
+            margin: 20px auto;
             padding: 20px;
             width: 90%;
-            max-width: 400px;
+            max-width: 600px;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
+        fieldset {
+            border: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        legend {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
         label {
             display: block;
             margin-bottom: 10px;
         }
+
         input {
             padding: 10px;
             width: 100%;
             margin-bottom: 20px;
         }
+
+        /* Selector más pequeño */
+        .small-select {
+            display: inline-block;
+            width: auto;
+        }
+
+        .small-select select {
+            padding: 8px;
+            width: 120px; /* Ajusta el tamaño según necesites */
+        }
+
+
         button {
             font-family: "Press Start 2P", cursive;
+            width: 100%;
+            padding: 10px;
         }
     </style>
     <script>
@@ -65,10 +94,27 @@
     <h1 class="nes-text is-primary">Descargador MP3</h1>
     <form id="formulario" method="post" onsubmit="mostrarCarga()" class="nes-container with-title">
         <p class="title">Procesar URL</p>
-        <label for="url" class="nes-text">Introduce una URL:</label>
-        <input type="text" id="url" name="url" class="nes-input" required>
+    
+        <fieldset>
+            <legend>Introduce los datos</legend>
+            
+            <label for="url" class="nes-text">Introduce una URL:</label>
+            <input type="text" id="url" name="url" class="nes-input" required>
+    
+            <label for="formato" class="nes-text">Elige formato:</label>
+            <div class="nes-select small-select">
+                <select id="formato" name="formato">
+                    <option value="mp3" selected>MP3</option>
+                    <option value="mp4">MP4</option>
+                </select>
+            </div>
+    
+    
+        </fieldset>
+    
         <button type="submit" class="nes-btn is-success">Procesar</button>
     </form>
+    
     <div id="loading">
         <p class="nes-text is-warning">Procesando, por favor espera...</p>
         <img src="https://i.gifer.com/ZZ5H.gif" alt="Cargando...">
