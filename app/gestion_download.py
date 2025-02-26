@@ -41,21 +41,36 @@ def renombrar_archivo(d):
     return(nuevo_path)
 
 
-def download_mp3(url):
+def download_mp3(url,formato='mp3'):
+    print(formato)
     try:
         # Borramos los archivos que existan en el directorio:
         yt_opts = {
             'verbose': True,
-            'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_')# -- Cambiar el nombre del archivo
-            ,
-            'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
+            'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_'),# -- Cambiar el nombre del archivo
             'ffmpeg_location': ffmpeg_path,  # Ruta del FFmpeg embebido
         }
+
+        # Si el formato es MP3 (descargar solo audio)
+        if formato.lower() == "mp3":
+            yt_opts.update({
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                }],
+            })
+
+        # Si el formato es MP4 (descargar video + audio)
+        elif formato.lower() == "mp4":
+            yt_opts.update({
+                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
+                'postprocessors': [{
+                    'key': 'FFmpegVideoConvertor',
+                    'preferedformat': 'mp4',
+                }],
+            })
 
         ydl = yt_dlp.YoutubeDL(yt_opts)
         info_dict = ydl.extract_info(url, download=True)
@@ -70,7 +85,8 @@ def download_mp3(url):
 
         file_path = renombrar_archivo(file_path)
         return(file_path)
-    except KeyError:
+    except Exception as e:
+        print(e)
         return("Error,Unable to fetch video information. Please check the video URL or your network connection")
     
 
@@ -91,7 +107,7 @@ def download_mp3(url):
 
 
 
-# print(download_mp3('https://youtu.be/GwxfSmKWX_k'))
+# print(download_mp3('https://youtu.be/LrgW6nd5YPg','mp4'))
 
 
 
