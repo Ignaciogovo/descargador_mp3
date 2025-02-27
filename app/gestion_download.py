@@ -2,6 +2,9 @@ import yt_dlp
 from imageio_ffmpeg import get_ffmpeg_exe 
 import os
 import time
+import re
+
+
 # /*
 # yt_dlp depende de FFmpeg para procesar y manipular archivos multimedia, como extraer audio de un video o convertir formatos
 # (Se istala un paquete en python [pip install imageio[ffmpeg] ]aunque es mejor por el sistema apt [sudo apt update && sudo apt install ffmpeg])
@@ -36,12 +39,10 @@ def borrar_archivos(nombre=None):
                     print(f"No se pudo borrar el archivo {nombre}: {e}")
         
 
-def renombrar_archivo(d):
-    # Ruta original del archivo
-    original_path = d
-    
-    # Crear la nueva ruta con espacios reemplazados por guiones bajos
-    nuevo_path = original_path.replace(' ', '_')
+def renombrar_archivo(original_path):    
+    # Remplazamos todos los simbolos que puedan generar problemas con la ruta
+    patron = r'[:*?"<>|~#¬｜ &]'
+    nuevo_path = re.sub(patron, '_', re.sub(r'\|', '_', original_path))
     
     # Renombrar el archivo
     if original_path != nuevo_path:
@@ -105,8 +106,8 @@ def download_mp3(url,formato='mp3'):
 
 
 #pruebas
-# if __name__ == '__main__':
-    # print(download_mp3('https://youtu.be/0vOpWqBGD8w?si=2n2RSg7kgsVNx7O2','mp3'))
+if __name__ == '__main__':
+    print(download_mp3('https://youtu.be/jRxrb_EtzQQ','mp3'))
 
 
 
