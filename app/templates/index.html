@@ -87,6 +87,12 @@
         function mostrarCarga() {
             document.getElementById('loading').style.display = 'block';
             document.getElementById('formulario').style.display = 'none';
+
+                    // Si el enlace de descarga existe, ocultarlo también
+        const enlaceDescarga = document.getElementById('enlace-descarga');
+        if (enlaceDescarga) {
+            enlaceDescarga.style.display = 'none';  // Oculta el enlace de descarga
+        }
         }
     </script>
 </head>
@@ -117,12 +123,16 @@
     
     <div id="loading">
         <p class="nes-text is-warning">Procesando, por favor espera...</p>
-        <img src="https://i.gifer.com/ZZ5H.gif" alt="Cargando...">
+        <img src="https://i.gifer.com/5Q0v.gif" alt="Cargando..." style="width: 101%; height: auto;" >
+        <!-- https://i.gifer.com/ZZ5H.gif -->
     </div>
-    <p class="nes-text">{{ mensaje }}</p>
-    {% if enlace_descarga %}
-        <a href="{{ enlace_descarga }}" class="nes-btn is-primary">Descargar archivo generado</a>
-    {% endif %}
+    <div id="enlace-descarga" >
+        <p class="nes-text">{{ mensaje }}</p>
+        {% if enlace_descarga %}
+            <a href="{{ enlace_descarga }}" class="nes-btn is-primary">Descargar archivo generado</a>
+        {% endif %}
+    </div>
+
 </body>
 </html>
 
