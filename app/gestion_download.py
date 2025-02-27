@@ -1,6 +1,7 @@
 import yt_dlp
 from imageio_ffmpeg import get_ffmpeg_exe 
 import os
+import time
 # /*
 # yt_dlp depende de FFmpeg para procesar y manipular archivos multimedia, como extraer audio de un video o convertir formatos
 # (Se istala un paquete en python [pip install imageio[ffmpeg] ]aunque es mejor por el sistema apt [sudo apt update && sudo apt install ffmpeg])
@@ -8,14 +9,23 @@ import os
 ffmpeg_path = get_ffmpeg_exe()
 
 def borrar_archivos(nombre=None):
-    if nombre == None:
+
+    if nombre == None: #-- Se borran los archivos creados después de dos horas
+        # Tiempo actual en segundos
+        tiempo_actual = time.time()
+        # Tiempo límite (1 hora = 3600 segundos)
+        limite_tiempo = tiempo_actual - 7200     
+        #Carpeta donde se encuentran las descargas        
         downloads_dir = "downloads"
         if os.path.exists(downloads_dir):
             for file in os.listdir(downloads_dir):
                 file_path = os.path.join(downloads_dir, file)
                 try:
                     if os.path.isfile(file_path):
-                        os.remove(file_path)
+                        tiempo_creacion = os.path.getctime(file_path)
+                        if limite_tiempo > tiempo_creacion:
+                            os.remove(file_path)
+                            print(f"Borrado archivo max 2 horas: {file_path}")
                 except Exception as e:
                     print(f"No se pudo borrar el archivo {file_path}: {e}")
     else:
@@ -24,7 +34,6 @@ def borrar_archivos(nombre=None):
                         os.remove(nombre)
         except Exception as e:
                     print(f"No se pudo borrar el archivo {nombre}: {e}")
-        
         
 
 def renombrar_archivo(d):
@@ -42,9 +51,11 @@ def renombrar_archivo(d):
 
 
 def download_mp3(url,formato='mp3'):
-    print(formato)
+    #Mecanismo de seguridad para borrar archivos anteriores a 2 horas:
+    borrar_archivos() 
+    
     try:
-        # Borramos los archivos que existan en el directorio:
+        # Configuración general
         yt_opts = {
             'verbose': True,
             'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_'),# -- Cambiar el nombre del archivo
@@ -91,23 +102,11 @@ def download_mp3(url,formato='mp3'):
     
 
 
-# def check_archivo(ruta):
-    
-#     if os.path.exists(ruta) and os.path.isfile(ruta):
-#         return(0)
-#     else:
-#         return(1)
-    
-# def borrar_archivo(ruta):
-#     if check_archivo(ruta)==0:
-#         # Borra el archivo
-#         os.remove(ruta)
 
 
-
-
-
-# print(download_mp3('https://youtu.be/LrgW6nd5YPg','mp4'))
+#pruebas
+# if __name__ == '__main__':
+    # print(download_mp3('https://youtu.be/0vOpWqBGD8w?si=2n2RSg7kgsVNx7O2','mp3'))
 
 
 
