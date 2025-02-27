@@ -1,7 +1,8 @@
 version: '3.8'
 
 services:
-  flask-app:
+  downloader_mp3-flask:
+    container_name: downloader_mp3
     build: .
     ports:
       - "5000:5000"
