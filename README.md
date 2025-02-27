@@ -29,10 +29,10 @@ A continuación, solo tendremos que acceder a la ruta http://127.0.0.1:5000 desd
 
 ## ⚠️ Notas importantes
 
-    Este proyecto es para fines educativos. Evita usarlo para actividades fraudulentas o ilegales.
-    Asegúrate de tener Docker y Docker Compose instalados en tu máquina para poder ejecutar este proyecto.
+Este proyecto es para fines educativos. Evita usarlo para actividades fraudulentas o ilegales.
+Asegúrate de tener Docker y Docker Compose instalados en tu máquina para poder ejecutar este proyecto.
 
 
 ## Pendientes
-    - Realizar un bot en telegram con la misma dinámica 
+- Realizar un bot en telegram con la misma dinámica 
     
