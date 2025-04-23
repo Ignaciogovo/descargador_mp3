@@ -1,6 +1,7 @@
 # MP3 Video Downloader  
 
-Este programa te permite descargar videos en formato MP3 y MP4 desde tu propio entorno, evitando la publicidad abusiva y riesgos de seguridad que puedan tener los convertidores en línea. Está desarrollado en **Python** y empaquetado con **Docker** para una instalación sencilla.
+Este programa te permite descargar videos en formato MP3 y MP4 desde tu propio entorno, evitando la publicidad abusiva y riesgos de seguridad que puedan tener los convertidores que se encuentran en internet.Este proyecto nació al no saber responder a un conocido si esos convertidores en internet son seguros, y aunque hoy en día no se usen mucho, si es que es mejor tenerlo para evitar cualquier problema de seguridad.
+Está desarrollado en **Python** y empaquetado con **Docker** para una instalación sencilla.
 
 
 ## Instalación y uso  
