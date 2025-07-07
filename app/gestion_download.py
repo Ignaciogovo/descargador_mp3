@@ -50,16 +50,15 @@ def renombrar_archivo(original_path):
         (f"Renombrado: {original_path} -> {nuevo_path}")
     return(nuevo_path)
 
+def download_mp3(url, formato='mp3'):
+    # Mecanismo de seguridad para borrar archivos anteriores a 2 horas:
+    borrar_archivos()
 
-def download_mp3(url,formato='mp3'):
-    #Mecanismo de seguridad para borrar archivos anteriores a 2 horas:
-    borrar_archivos() 
-    
     try:
         # Configuración general
         yt_opts = {
             'verbose': True,
-            'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_'),# -- Cambiar el nombre del archivo
+            'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_'),  # Cambiar el nombre del archivo
             'ffmpeg_location': ffmpeg_path,  # Ruta del FFmpeg embebido
         }
 
@@ -86,8 +85,8 @@ def download_mp3(url,formato='mp3'):
 
         ydl = yt_dlp.YoutubeDL(yt_opts)
         info_dict = ydl.extract_info(url, download=True)
-        
-       # Obtener el archivo final (después del postprocesamiento)
+
+        # Obtener el archivo final (después del postprocesamiento)
         try:
             # Busca el archivo procesado en los metadatos
             file_path = info_dict['requested_downloads'][0]['filepath']
@@ -96,10 +95,15 @@ def download_mp3(url,formato='mp3'):
             file_path = ydl.prepare_filename(info_dict)
 
         file_path = renombrar_archivo(file_path)
-        return(file_path)
+        return file_path
+
     except Exception as e:
+        error_msg = str(e)
+        if "Sign in to confirm your age" in error_msg or "Use --cookies-from-browser" in error_msg:
+            return "Error: Este video requiere autenticación (iniciar sesión en YouTube). El programa actualmente no está preparado para manejar videos con restricción por edad."
         print(e)
-        return("Error,Unable to fetch video information. Please check the video URL or your network connection")
+        return "Error: No se pudo obtener la información del video. Verifica la URL o tu conexión a internet."
+
     
 
 

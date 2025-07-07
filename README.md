@@ -35,5 +35,6 @@ Asegúrate de tener Docker y Docker Compose instalados en tu máquina para poder
 
 
 ## Pendientes
+- Añadir cookies para videos que requieren autenticación
 - Realizar un bot en telegram con la misma dinámica 
     
