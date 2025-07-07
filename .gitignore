@@ -1,0 +1,4 @@
+.env
+app/downloads/*
+app/__pycache__
+!app/downloads/.gitkeep

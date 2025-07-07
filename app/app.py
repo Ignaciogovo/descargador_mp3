@@ -36,7 +36,7 @@ def descargar():
     if archivo and os.path.exists(archivo):
         return send_file(archivo, as_attachment=True)
     else:
-        return "Archivo no encontrado", 404
+        return "Archivo no encontrado: "+str(archivo), 404
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
