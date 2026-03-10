@@ -1,4 +1,5 @@
 .env
 app/downloads/*
-app/__pycache__
+__pycache__
 !app/downloads/.gitkeep
+tests

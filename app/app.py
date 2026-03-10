@@ -15,15 +15,14 @@ def formulario():
         formato = request.form.get('formato')
 
         if url:
-            # Llama a la función para procesar la URL
-            archivo_generado = download_mp3(url,formato)
+            archivo_generado = download_mp3(url, formato)
 
-            # Guarda el enlace para la descarga
-            enlace_descarga = f"/descargar?archivo={archivo_generado}"
-            # Inicia un hilo para borrar el archivo después de 5 minutos
-            threading.Timer(300,borrar_archivos, args=(archivo_generado,)).start()
-      
-            mensaje = "Archivo generado correctamente. Puedes descargarlo a continuación."
+            if archivo_generado and not archivo_generado.startswith('Error:'):
+                enlace_descarga = f"/descargar?archivo={archivo_generado}"
+                threading.Timer(300, borrar_archivos, args=(archivo_generado,)).start()
+                mensaje = "Archivo generado correctamente. Puedes descargarlo a continuación."
+            else:
+                mensaje = archivo_generado or "Error desconocido al procesar el video."
         else:
             mensaje = "Por favor, introduce una URL válida."
 

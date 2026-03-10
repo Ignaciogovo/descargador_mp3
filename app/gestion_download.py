@@ -58,8 +58,30 @@ def download_mp3(url, formato='mp3'):
         # Configuración general
         yt_opts = {
             'verbose': True,
-            'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_'),  # Cambiar el nombre del archivo
-            'ffmpeg_location': ffmpeg_path,  # Ruta del FFmpeg embebido
+            'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_'),
+            'ffmpeg_location': ffmpeg_path,
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'DNT': '1',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+                'Sec-Fetch-Dest': 'document',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-Site': 'none',
+                'Sec-Fetch-User': '?1',
+                'Cache-Control': 'max-age=0',
+            },
+            'extractor_retries': 3,
+            'fragment_retries': 3,
+            'nocheckcertificate': True,
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android'],
+                },
+            },
         }
 
         # Si el formato es MP3 (descargar solo audio)
@@ -76,23 +98,21 @@ def download_mp3(url, formato='mp3'):
         # Si el formato es MP4 (descargar video + audio)
         elif formato.lower() == "mp4":
             yt_opts.update({
-                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
-                'postprocessors': [{
-                    'key': 'FFmpegVideoConvertor',
-                    'preferedformat': 'mp4',
-                }],
+                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best',
+                'merge_output_format': 'mp4',
             })
 
         ydl = yt_dlp.YoutubeDL(yt_opts)
         info_dict = ydl.extract_info(url, download=True)
 
-        # Obtener el archivo final (después del postprocesamiento)
-        try:
-            # Busca el archivo procesado en los metadatos
-            file_path = info_dict['requested_downloads'][0]['filepath']
-        except (KeyError, IndexError):
-            # Si no se encuentra, devuelve el archivo original como fallback
-            file_path = ydl.prepare_filename(info_dict)
+        file_path = ydl.prepare_filename(info_dict)
+
+        if info_dict.get('requested_downloads'):
+            downloaded = info_dict['requested_downloads']
+            if downloaded and len(downloaded) > 0:
+                filepath = downloaded[0].get('filepath')
+                if filepath:
+                    file_path = filepath
 
         file_path = renombrar_archivo(file_path)
         return file_path
@@ -102,7 +122,7 @@ def download_mp3(url, formato='mp3'):
         if "Sign in to confirm your age" in error_msg or "Use --cookies-from-browser" in error_msg:
             return "Error: Este video requiere autenticación (iniciar sesión en YouTube). El programa actualmente no está preparado para manejar videos con restricción por edad."
         print(e)
-        return "Error: No se pudo obtener la información del video. Verifica la URL o tu conexión a internet."
+        return f"Error: No se pudo obtener la información del video. Detalles: {error_msg}"
 
     
 
