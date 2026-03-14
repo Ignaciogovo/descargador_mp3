@@ -7,7 +7,7 @@ Está desarrollado en **Python** y empaquetado con **Docker** para una instalaci
 ## Instalación y uso  
 Clonamos el repositorio
 ```bash
-> git clone https://github.com/Ignaciogovo/CronTransfer.git
+> git clone https://github.com/Ignaciogovo/descargador_mp3.git
 ```
 
 Accedemos a directorio app 
