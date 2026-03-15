@@ -58,6 +58,7 @@ def download_mp3(url, formato='mp3'):
         # Configuración general
         yt_opts = {
             'verbose': True,
+            'noplaylist': True,
             'outtmpl': 'downloads/%(title)s.%(ext)s'.replace(' ', '_'),
             'ffmpeg_location': ffmpeg_path,
             'http_headers': {
