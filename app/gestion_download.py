@@ -51,9 +51,6 @@ def renombrar_archivo(original_path):
     return(nuevo_path)
 
 def download_mp3(url, formato='mp3'):
-    # Mecanismo de seguridad para borrar archivos anteriores a 2 horas:
-    borrar_archivos()
-
     try:
         # Configuración general
         yt_opts = {
@@ -132,7 +129,8 @@ def download_mp3(url, formato='mp3'):
 
 #pruebas
 if __name__ == '__main__':
-    print(download_mp3('https://youtu.be/jRxrb_EtzQQ','mp3'))
+    print(download_mp3('https://www.youtube.com/watch?v=nBmNcLBaPUE&list=RD3xt8Mp8oWzc&index=2&pp=8AUB','mp3'))
+    borrar_archivos()
 
 
 

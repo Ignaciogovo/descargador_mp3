@@ -7,8 +7,7 @@
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
     <style>
-        /* Estilo para la barra de carga */
-        #loading {
+        #loading, #resultado, #mensaje-error {
             display: none;
             text-align: center;
             margin-top: 20px;
@@ -16,7 +15,6 @@
         #loading img {
             width: 50px;
         }
-        /* Personalización adicional para el diseño */
         body {
             font-family: "Press Start 2P", cursive;
             background-color: #f4f4f4;
@@ -29,9 +27,7 @@
             min-height: 100vh;
             margin: 0;
         }
-        h1 {
-            color: #333;
-        }
+        h1 { color: #333; }
         form {
             margin: 20px auto;
             padding: 20px;
@@ -41,42 +37,27 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
         fieldset {
             border: none;
             padding: 0;
             margin-bottom: 20px;
         }
-
         legend {
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
         }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-        }
-
+        label { display: block; margin-bottom: 10px; }
         input {
             padding: 10px;
             width: 100%;
             margin-bottom: 20px;
         }
-
-        /* Selector más pequeño */
-        .small-select {
-            display: inline-block;
-            width: auto;
-        }
-
+        .small-select { display: inline-block; width: auto; }
         .small-select select {
             padding: 8px;
-            width: 120px; /* Ajusta el tamaño según necesites */
+            width: 120px;
         }
-
-
         button {
             font-family: "Press Start 2P", cursive;
             width: 100%;
@@ -84,29 +65,131 @@
         }
     </style>
     <script>
-        function mostrarCarga() {
+        let sessionId = "";
+        let pollingActivo = false;
+        
+        function iniciarDescarga(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const url = document.getElementById('url').value;
+            const formato = document.getElementById('formato').value;
+            
+            if (!url) return;
+            
+            sessionId = "";
+            sessionStorage.removeItem('sessionId');
+            
             document.getElementById('loading').style.display = 'block';
             document.getElementById('formulario').style.display = 'none';
-
-                    // Si el enlace de descarga existe, ocultarlo también
-        const enlaceDescarga = document.getElementById('enlace-descarga');
-        if (enlaceDescarga) {
-            enlaceDescarga.style.display = 'none';  // Oculta el enlace de descarga
+            document.getElementById('resultado').style.display = 'none';
+            document.getElementById('mensaje-error').style.display = 'none';
+            document.getElementById('posicion-cola').textContent = 'Iniciando descarga...';
+            
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: 'url=' + encodeURIComponent(url) + '&formato=' + encodeURIComponent(formato)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Respuesta:', data);
+                if (data.error) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('mensaje-error').style.display = 'block';
+                    document.getElementById('mensaje-error').textContent = data.error;
+                    document.getElementById('formulario').style.display = 'block';
+                } else if (data.session_id) {
+                    sessionId = data.session_id;
+                    sessionStorage.setItem('sessionId', sessionId);
+                    verificarEstado();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('mensaje-error').style.display = 'block';
+                document.getElementById('mensaje-error').textContent = 'Error al iniciar la descarga';
+                document.getElementById('formulario').style.display = 'block';
+            });
+            
+            return false;
         }
+        
+        function verificarEstado() {
+            if (!sessionId || pollingActivo) return;
+            
+            pollingActivo = true;
+            
+            fetch('/estado_descarga?session_id=' + sessionId)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Estado:', data);
+                    pollingActivo = false;
+                    
+                    if (data.estado === 'completado' && data.archivo) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('resultado').style.display = 'block';
+                        document.getElementById('btn-descargar').href = data.archivo;
+                        document.getElementById('btn-descargar').style.display = 'inline-block';
+                        sessionStorage.removeItem('sessionId');
+                        sessionId = "";
+                        pollingActivo = false;
+                    } else if (data.estado === 'error') {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('mensaje-error').style.display = 'block';
+                        document.getElementById('mensaje-error').textContent = data.archivo || 'Error desconocido';
+                        document.getElementById('formulario').style.display = 'block';
+                        sessionStorage.removeItem('sessionId');
+                        sessionId = "";
+                        pollingActivo = false;
+                    } else if (data.estado === 'descargando') {
+                        document.getElementById('posicion-cola').textContent = 'Descargando...';
+                        setTimeout(verificarEstado, 3000);
+                    } else if (data.estado === 'avance_cola') {
+                        document.getElementById('posicion-cola').textContent = 'Tu descarga ha avanzado. Nueva posición: ' + data.posicion;
+                        setTimeout(verificarEstado, 3000);
+                    } else if (data.estado === 'en_cola') {
+                        document.getElementById('posicion-cola').textContent = 'Posición en cola: ' + data.posicion;
+                        setTimeout(verificarEstado, 5000);
+                    } else {
+                        setTimeout(verificarEstado, 2000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    pollingActivo = false;
+                    setTimeout(verificarEstado, 2000);
+                });
         }
+        
+        window.onload = function() {
+            const form = document.getElementById('formulario');
+            form.addEventListener('submit', iniciarDescarga);
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('descarga')) {
+                sessionId = sessionStorage.getItem('sessionId');
+                if (sessionId) {
+                    document.getElementById('loading').style.display = 'block';
+                    document.getElementById('formulario').style.display = 'none';
+                    verificarEstado();
+                }
+            }
+        };
     </script>
 </head>
 <body>
     <h1 class="nes-text is-primary">Descargador MP3</h1>
-    <form id="formulario" method="post" onsubmit="mostrarCarga()" class="nes-container with-title">
+    <form id="formulario" method="post" class="nes-container with-title">
         <p class="title">Procesar URL</p>
-    
         <fieldset>
             <legend>Introduce los datos</legend>
-            
             <label for="url" class="nes-text">Introduce una URL:</label>
             <input type="text" id="url" name="url" class="nes-input" required>
-    
             <label for="formato" class="nes-text">Elige formato:</label>
             <div class="nes-select small-select">
                 <select id="formato" name="formato">
@@ -114,25 +197,23 @@
                     <option value="mp4">MP4</option>
                 </select>
             </div>
-    
-    
         </fieldset>
-    
         <button type="submit" class="nes-btn is-success">Procesar</button>
     </form>
     
     <div id="loading">
         <p class="nes-text is-warning">Procesando, por favor espera...</p>
-        <img src="https://i.gifer.com/5Q0v.gif" alt="Cargando..." style="width: 101%; height: auto;" >
-        <!-- https://i.gifer.com/ZZ5H.gif -->
+        <p id="posicion-cola" class="nes-text"></p>
+        <img src="https://i.gifer.com/5Q0v.gif" alt="Cargando..." style="width: 101%; height: auto;">
     </div>
-    <div id="enlace-descarga" >
-        <p class="nes-text">{{ mensaje }}</p>
-        {% if enlace_descarga %}
-            <a href="{{ enlace_descarga }}" class="nes-btn is-primary">Descargar archivo generado</a>
-        {% endif %}
+    
+    <div id="resultado">
+        <p class="nes-text is-success">¡Archivo descargado correctamente!</p>
+        <a id="btn-descargar" href="#" class="nes-btn is-primary">Descargar archivo</a>
+        <button id="btn-nueva" class="nes-btn is-success" style="margin-top: 20px;" onclick="location.reload()">Nueva descarga</button>
     </div>
+    
+    <div id="mensaje-error" class="nes-text is-error"></div>
 
 </body>
 </html>
-
