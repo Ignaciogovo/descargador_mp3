@@ -1,3 +1,8 @@
+---
+name: telegram-bot
+description: Best practices for implementing Telegram bots using python-telegram-bot, including async handlers and conversation flows
+---
+
 # Telegram Bot Integration Skill
 
 When implementing Telegram bots:

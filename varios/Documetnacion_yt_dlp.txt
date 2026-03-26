@@ -24,7 +24,6 @@ ydl_opts = {
 
 
 
-
 outtmpl --> 
 
 Variables útiles en outtmpl

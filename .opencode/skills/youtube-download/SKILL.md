@@ -1,3 +1,8 @@
+---
+name: youtube-download
+description: Best practices for downloading videos using yt-dlp including URL validation, safe filenames, and progress tracking
+---
+
 # YouTube Download Best Practices
 
 When using yt-dlp:
