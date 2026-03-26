@@ -9,9 +9,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY . /app
 
-RUN pip install --no-cache-dir flask imageio[ffmpeg] yt_dlp
+RUN pip install --no-cache-dir flask imageio[ffmpeg] yt_dlp python-telegram-bot==20.8 python-dotenv nest-asyncio
+
+RUN chmod +x start.sh
 
 EXPOSE 5000
 
-CMD ["python", "app.py"]
+CMD ["./start.sh"]
 

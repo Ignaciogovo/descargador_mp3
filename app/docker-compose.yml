@@ -8,6 +8,8 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
+      - ./logs:/app/logs
+      - ${HOME}/.secrets/bot_telegram_mp3/.env:/app/.env:ro
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development

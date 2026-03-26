@@ -1,5 +1,9 @@
 .env
 app/downloads/*
+app/__pycache__
+app/.pytest_cache
+app/logs
+venv/
+.pytest_cache/
+tests/
 __pycache__
-!app/downloads/.gitkeep
-tests
