@@ -9,6 +9,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
 from gestion_download import download_mp3
 from cola_descargas import cola_descargas
+from acceso import requiere_autorizacion, es_usuario_autorizado, registrar_intento_bloqueado
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -92,6 +93,7 @@ def crear_callback_telegram(user_id, chat_id, context, formato=None):
     return callback_telegram_sync
 
 
+@requiere_autorizacion
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "¡Hola! 🎵\n\n"
@@ -100,6 +102,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+@requiere_autorizacion
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Comandos disponibles:\n"
@@ -113,6 +116,7 @@ def es_url_valida(texto: str) -> bool:
     return bool(URL_PATTERN.match(texto.strip()))
 
 
+@requiere_autorizacion
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     texto = update.message.text.strip()
@@ -144,10 +148,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    from acceso import es_usuario_autorizado, registrar_intento_bloqueado, registrar_acceso_permitido
+    
     query = update.callback_query
     await query.answer()
 
-    user_id = str(query.from_user.id)
+    user_id = update.effective_user.id
+    
+    if not es_usuario_autorizado(user_id):
+        registrar_intento_bloqueado(user_id, query.data)
+        await query.message.reply_text(
+            "⛔ No tienes permiso para usar este bot.\n"
+            "Contacta con el administrador si crees que esto es un error."
+        )
+        return
+    
+    registrar_acceso_permitido(user_id, query.data)
+    
+    user_id_str = str(query.from_user.id)
     data = query.data
     chat_id = query.message.chat_id
 
