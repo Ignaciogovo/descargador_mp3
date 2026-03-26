@@ -85,7 +85,7 @@ def estado_descarga():
         
         posicion_real = cola_descargas.obtener_posicion(session_id)
         
-        if posicion_real == 0:
+        if posicion_real == 0 and data['estado'] not in ('completado', 'error'):
             data['estado'] = 'descargando'
             data['posicion'] = 1
         elif posicion_real > 0:
