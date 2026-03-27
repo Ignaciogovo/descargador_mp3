@@ -86,11 +86,18 @@ def download_mp3(url, formato='mp3'):
         if formato.lower() == "mp3":
             yt_opts.update({
                 'format': 'bestaudio/best',
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',
-                    'preferredquality': '192',
-                }],
+                'writethumbnail': True,
+                'embed_thumbnail': True,
+                'postprocessors': [
+                    {
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'mp3',
+                        'preferredquality': '192',
+                    },
+                    {
+                        'key': 'EmbedThumbnail',
+                    },
+                ],
             })
 
         # Si el formato es MP4 (descargar video + audio)
