@@ -1,5 +1,6 @@
 import logging
 import os
+from logging.handlers import TimedRotatingFileHandler
 
 
 def setup_logger(name='cola'):
@@ -23,7 +24,13 @@ def setup_logger(name='cola'):
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         
-        file_handler = logging.FileHandler(log_file)
+        file_handler = TimedRotatingFileHandler(
+            log_file,
+            when='midnight',
+            interval=1,
+            backupCount=7,
+            encoding='utf-8'
+        )
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
         
