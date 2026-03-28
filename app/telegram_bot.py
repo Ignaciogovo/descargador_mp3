@@ -9,7 +9,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
 from gestion_download import download_mp3
 from cola_descargas import cola_descargas
-from acceso import requiere_autorizacion, es_usuario_autorizado, registrar_intento_bloqueado
+from acceso import requiere_autorizacion, es_usuario_autorizado, registrar_intento_bloqueado, es_admin, buscar_nombre_por_id
+from admin import admin_command
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -207,6 +208,7 @@ async def main():
     print("[TELEGRAM_BOT] Añadiendo handlers...")
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("admin", admin_command))
     app.add_handler(CallbackQueryHandler(handle_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_error_handler(error_handler)
