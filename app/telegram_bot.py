@@ -7,13 +7,15 @@ nest_asyncio.apply()
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
-from gestion_download import download_mp3
+from gestion_download import download_mp3, borrar_archivos
 from cola_descargas import cola_descargas
-from acceso import requiere_autorizacion, es_usuario_autorizado, registrar_intento_bloqueado
+from acceso import requiere_autorizacion, es_usuario_autorizado, registrar_intento_bloqueado, es_admin, buscar_nombre_por_id
+from admin import admin_command
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+TELEGRAM_MAX_FILE_SIZE = 50 * 1024 * 1024
 
 print(f"[TELEGRAM_BOT] Token encontrado: {'SI' if TOKEN else 'NO'}")
 if TOKEN:
@@ -70,15 +72,31 @@ def crear_callback_telegram(user_id, chat_id, context, formato=None):
             
             elif estado == "completado":
                 if archivo and not archivo.startswith("Error:"):
-                    with open(archivo, "rb") as f:
-                        if formato and formato.lower() == "mp3":
-                            await context.bot.send_audio(chat_id=chat_id, audio=f)
-                        else:
-                            await context.bot.send_video(chat_id=chat_id, video=f)
-                    await context.bot.send_message(
-                        chat_id=chat_id,
-                        text=f"✅ ¡Descarga completada! 🎵\nFormato: {formato.upper() if formato else 'MP3'}"
-                    )
+                    try:
+                        file_size = os.path.getsize(archivo)
+                    except OSError:
+                        file_size = 0
+                    
+                    if file_size > TELEGRAM_MAX_FILE_SIZE:
+                        await context.bot.send_message(
+                            chat_id=chat_id,
+                            text=(
+                                f"✅ Descarga completada pero no se puede enviar por Telegram.\n"
+                                f"📁 El archivo ({file_size / (1024*1024):.1f} MB) excede el límite de 50 MB que ofrece Telegram.\n"
+                                f"🌐 Podrías intentar descargar desde la web oficial de Descargador MP3 si tienes acceso a ella."
+                            )
+                        )
+                        borrar_archivos(archivo)
+                    else:
+                        with open(archivo, "rb") as f:
+                            if formato and formato.lower() == "mp3":
+                                await context.bot.send_audio(chat_id=chat_id, audio=f)
+                            else:
+                                await context.bot.send_video(chat_id=chat_id, video=f)
+                        await context.bot.send_message(
+                            chat_id=chat_id,
+                            text=f"✅ ¡Descarga completada! 🎵\nFormato: {formato.upper() if formato else 'MP3'}"
+                        )
                 else:
                     await context.bot.send_message(
                         chat_id=chat_id,
@@ -207,6 +225,7 @@ async def main():
     print("[TELEGRAM_BOT] Añadiendo handlers...")
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("admin", admin_command))
     app.add_handler(CallbackQueryHandler(handle_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_error_handler(error_handler)

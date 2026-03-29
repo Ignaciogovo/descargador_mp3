@@ -13,6 +13,7 @@ Está desarrollado en **Python** y empaquetado con **Docker** para una instalaci
 - ✅ **Sistema de colas** con notificaciones de progreso
 - ✅ **Cover art** automático (thumbnail del vídeo como imagen del álbum)
 - ✅ **Control de acceso** para el bot de Telegram (solo usuarios autorizados)
+- ✅ **Panel de administración** (/admin) para gestionar usuarios
 - ✅ **Limpieza automática** de archivos después de 2 horas
 - ✅ **Logs de acceso** con retención de 7 días
 
@@ -22,6 +23,7 @@ Está desarrollado en **Python** y empaquetado con **Docker** para una instalaci
 
 - Docker y Docker Compose instalados
 - Token de bot de Telegram (opcional, solo si usas el bot)
+- ID de administrador de Telegram (requerido para usar /admin)
 
 ---
 
@@ -40,22 +42,16 @@ cd descargador_mp3/app
 cp config/.env.example .env
 ```
 
-Edita el archivo `.env` y añade tu token de Telegram:
+Edita el archivo `.env` y añade tu token de Telegram y tu ID como administrador:
 
 ```
 TELEGRAM_BOT_TOKEN=tu_token_aqui
+TELEGRAM_ADMIN_ID=tu_id_aqui
 ```
 
-### 3. Configurar usuarios autorizados (Telegram)
+### 3. Obtener tu ID de Telegram
 
-Edita el archivo `config/usuarios_autorizados.txt` y añade tu ID de Telegram (un usuario por línea):
-
-```
-123456789
-987654321
-```
-
-Para obtener tu ID de Telegram, talk to [@userinfobot](https://t.me/userinfobot) in Telegram.
+Habla con [@userinfobot](https://t.me/userinfobot) en Telegram para obtener tu ID.
 
 ### 4. Construir y ejecutar
 
@@ -85,6 +81,26 @@ Accede a http://127.0.0.1:5000 desde tu navegador:
 4. Selecciona MP3 o MP4
 5. Recibe el archivo cuando termine
 
+### Comandos de Administrador
+
+El administrador puede gestionar usuarios autorizados con los siguientes comandos:
+
+| Comando | Descripción |
+|---------|-------------|
+| `/admin add <id> <nombre>` | Añadir usuario autorizado |
+| `/admin remove <id>` | Eliminar usuario autorizado |
+| `/admin list` | Listar usuarios autorizados |
+| `/admin help` | Mostrar ayuda |
+
+**Ejemplos:**
+```
+/admin add 123456789 Ignacio
+/admin remove 123456789
+/admin list
+```
+
+**Nota:** Solo el administrador (configurado en `TELEGRAM_ADMIN_ID`) puede usar estos comandos.
+
 ---
 
 ## Configuración
@@ -94,6 +110,7 @@ Accede a http://127.0.0.1:5000 desde tu navegador:
 | Variable | Descripción | Valor por defecto |
 |----------|-------------|-------------------|
 | `TELEGRAM_BOT_TOKEN` | Token del bot de Telegram | (requerido) |
+| `TELEGRAM_ADMIN_ID` | ID del administrador de Telegram | (requerido) |
 | `MODO` | Modo de ejecución: `web`, `telegram` o `ambos` | `ambos` |
 | `MAX_COLA_DESCARGAS` | Máximo de descargas simultáneas | `50` |
 
@@ -112,6 +129,20 @@ MODO=telegram docker-compose up -d
 MODO=ambos docker-compose up -d
 ```
 
+### Archivo de usuarios autorizados
+
+El archivo `config/usuarios_autorizados.txt` almacena los usuarios con el formato:
+
+```
+id|nombre
+```
+
+Ejemplo:
+```
+123456789|Ignacio
+987654321|María
+```
+
 ---
 
 ## Logs
@@ -120,7 +151,7 @@ Los archivos de log se encuentran en la carpeta `/logs` dentro del contenedor:
 
 | Archivo | Descripción |
 |---------|-------------|
-| `access.log` | Intentos de acceso al bot (usuarios autorizados y bloqueados) |
+| `access.log` | Intentos de acceso al bot y comandos de administración |
 | `cola_descargas.log` | Actividad del sistema de colas |
 
 Los logs se mantienen automáticamente durante 7 días.
@@ -128,16 +159,6 @@ Los logs se mantienen automáticamente durante 7 días.
 ---
 
 ## Mantenimiento
-
-### Añadir usuarios autorizados
-
-Puedes usar el script incluido:
-
-```bash
-./agregar_usuario.sh 123456789
-```
-
-O editar directamente `config/usuarios_autorizados.txt`.
 
 ### Ver logs en tiempo real
 
@@ -151,7 +172,8 @@ docker-compose logs -f
 
 - Este proyecto es para fines educativos. Evita usarlo para actividades fraudulentas o ilegales.
 - Los archivos se borran automáticamente después de 2 horas.
-- Solo los usuarios listados en `usuarios_autorizados.txt` pueden usar el bot de Telegram.
+- La lista de usuarios autorizados (`usuarios_autorizados.txt`) es solo para el bot de Telegram.
+- La interfaz web no utiliza este sistema de control de acceso.
 - Asegúrate de tener Docker y Docker Compose instalados.
 
 ---
