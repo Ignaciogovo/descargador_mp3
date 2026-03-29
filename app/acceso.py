@@ -19,6 +19,15 @@ ARCHIVO_LOG = os.path.join(CARPETA_LOGS, "access.log")
 _logger = None
 
 
+def es_control_acceso_activo() -> bool:
+    """Verifica si el control de acceso está activo.
+    
+    Returns:
+        True si CONTROL_ACCESO='S', False si CONTROL_ACCESO='N' o no está definido.
+    """
+    return os.environ.get("CONTROL_ACCESO", "N").upper() == "S"
+
+
 def _obtener_logger() -> logging.Logger:
     """Obtiene o crea el logger de acceso."""
     global _logger
@@ -122,7 +131,11 @@ def es_admin(user_id: Union[int, str]) -> bool:
     
     Returns:
         True si es el administrador, False en caso contrario.
+        Si CONTROL_ACCESO=N, siempre retorna True.
     """
+    if not es_control_acceso_activo():
+        return True
+    
     admin_id = os.environ.get('TELEGRAM_ADMIN_ID')
     if not admin_id:
         print("[ACCESO] ADVERTENCIA: TELEGRAM_ADMIN_ID no está configurado")
@@ -138,7 +151,11 @@ def es_usuario_autorizado(user_id: Union[int, str]) -> bool:
     
     Returns:
         True si el usuario está autorizado o es admin, False en caso contrario.
+        Si CONTROL_ACCESO=N, siempre retorna True.
     """
+    if not es_control_acceso_activo():
+        return True
+    
     user_id_str = str(user_id)
     if es_admin(user_id_str):
         return True
@@ -166,7 +183,13 @@ def registrar_intento_bloqueado(user_id: Union[int, str], comando: Optional[str]
         user_id: ID del usuario que intentó acceder.
         comando: Comando o mensaje que intentó ejecutar.
         chat_id: ID del chat donde ocurrió el intento.
+    
+    Nota:
+        No hace nada si CONTROL_ACCESO=N.
     """
+    if not es_control_acceso_activo():
+        return
+    
     logger = _obtener_logger()
     
     nombre = buscar_nombre_por_id(user_id)
@@ -188,7 +211,13 @@ def registrar_acceso_permitido(user_id: Union[int, str], comando: Optional[str] 
     Args:
         user_id: ID del usuario que accedió.
         comando: Comando que ejecutó.
+    
+    Nota:
+        No hace nada si CONTROL_ACCESO=N.
     """
+    if not es_control_acceso_activo():
+        return
+    
     logger = _obtener_logger()
     
     partes = [f"user_id={user_id}", "ACCESS=OK"]
@@ -202,6 +231,8 @@ def registrar_acceso_permitido(user_id: Union[int, str], comando: Optional[str] 
 def requiere_autorizacion(func: Callable) -> Callable:
     """Decorador para requerir autorización en un handler de Telegram.
     
+    Si CONTROL_ACCESO=N, no requiere autorización y permite el acceso.
+    
     Uso:
         @requiere_autorizacion
         async def mi_comando(update, context):
@@ -209,6 +240,9 @@ def requiere_autorizacion(func: Callable) -> Callable:
     """
     @functools.wraps(func)
     async def wrapper(update: "Update", context: "ContextTypes.DEFAULT_TYPE"):
+        if not es_control_acceso_activo():
+            return await func(update, context)
+        
         user_id = update.effective_user.id
         
         if hasattr(update, "message"):
@@ -341,7 +375,13 @@ def registrar_comando_admin(admin_id: str, accion: str, target: Optional[str] = 
         accion: Acción realizada (add, remove, list).
         target: Objetivo de la acción (user_id o nombre).
         resultado: Resultado de la acción.
+    
+    Nota:
+        No hace nada si CONTROL_ACCESO=N.
     """
+    if not es_control_acceso_activo():
+        return
+    
     logger = _obtener_logger()
     
     partes = [f"ADMIN", f"admin_id={admin_id}", f"action={accion}"]

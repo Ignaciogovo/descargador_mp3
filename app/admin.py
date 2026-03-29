@@ -7,7 +7,7 @@ from typing import Optional
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from acceso import es_admin, anadir_usuario, eliminar_usuario, listar_usuarios, registrar_comando_admin, buscar_nombre_por_id
+from acceso import es_admin, anadir_usuario, eliminar_usuario, listar_usuarios, registrar_comando_admin, buscar_nombre_por_id, es_control_acceso_activo, requiere_autorizacion
 
 
 def validar_user_id(user_id: str) -> bool:
@@ -26,6 +26,7 @@ def validar_user_id(user_id: str) -> bool:
     return True
 
 
+@requiere_autorizacion
 async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Maneja el comando /admin y sus subcomandos.
     
